@@ -5,16 +5,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function createLoginScene() {
         gameContainer.className = 'login-scene';
         gameContainer.innerHTML = `
-            <div class="scene-title">로그인</div>
+            <div class="scene-title">Login</div>
             <div class="game-content">
                 <h1>Arrow Input Game</h1>
                 <div class="arrow-container">
+                    <img src="images/press_arrow.png" alt="Press Arrow" class="press-arrow-image">
                     <img src="images/arrow_left.png" alt="Left Arrow" class="arrow-image">
                     <img src="images/arrow_down.png" alt="Down Arrow" class="arrow-image">
                     <img src="images/arrow_right.png" alt="Right Arrow" class="arrow-image">
                 </div>
-                <input type="text" id="nickname" placeholder="닉네임을 입력하세요">
-                <button id="start-button">시작</button>
+                <input type="text" id="nickname" placeholder="Enter your nickname">
+                <button id="start-button">Start</button>
             </div>
         `;
 
@@ -23,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (nickname !== '') {
                 createReadyScene();
             } else {
-                alert('닉네임을 입력해주세요.');
+                alert('Please enter a nickname.');
             }
         });
     }
@@ -32,18 +33,18 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.className = 'other-scene';
         gameContainer.innerHTML = `
             <div class="nickname">${nickname}</div>
-            <div class="scene-title">게임 준비</div>
+            <div class="scene-title">Game Ready</div>
             <button class="logout">Log out</button>
             <div class="game-content">
-                <h2>게임 준비</h2>
-                <button id="game-start-button">게임 시작</button>
+                <h2>Get Ready</h2>
+                <button id="game-start-button">Start Game</button>
             </div>
             <div class="ranking-container">
-                <h3>랭킹</h3>
+                <h3>Ranking</h3>
                 <ul class="ranking-list">
-                    <li>1. Player1 - 1000점</li>
-                    <li>2. Player2 - 900점</li>
-                    <li>3. Player3 - 800점</li>
+                    <li>1. Player1 - 1000 pts</li>
+                    <li>2. Player2 - 900 pts</li>
+                    <li>3. Player3 - 800 pts</li>
                 </ul>
             </div>
         `;
@@ -57,12 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.className = 'other-scene';
         gameContainer.innerHTML = `
             <div class="nickname">${nickname}</div>
-            <div class="scene-title">게임 플레이</div>
+            <div class="scene-title">Game Play</div>
             <button class="logout">Log out</button>
             <div class="game-content">
                 <div id="countdown">3</div>
-                <h2 id="game-status" style="display: none;">게임이 진행중입니다</h2>
-                <button id="end-game-button" style="display: none;">게임 종료</button>
+                <h2 id="game-status" style="display: none;">Game in progress</h2>
+                <button id="end-game-button" style="display: none;">End Game</button>
             </div>
         `;
 
@@ -87,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
 
         function startGame() {
-            // 여기에 게임 시작 로직을 추가하세요
+            // Add game start logic here
             endGameButton.addEventListener('click', createEndScene);
         }
     }
@@ -96,18 +97,18 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.className = 'other-scene';
         gameContainer.innerHTML = `
             <div class="nickname">${nickname}</div>
-            <div class="scene-title">게임 종료</div>
+            <div class="scene-title">Game Over</div>
             <button class="logout">Log out</button>
             <div class="game-content">
-                <h2>게임이 종료되었습니다</h2>
-                <button id="restart-button">재시작</button>
+                <h2>Game Over</h2>
+                <button id="restart-button">Restart</button>
             </div>
             <div class="ranking-container">
-                <h3>랭킹</h3>
+                <h3>Ranking</h3>
                 <ul class="ranking-list">
-                    <li>1. Player1 - 1000점</li>
-                    <li>2. Player2 - 900점</li>
-                    <li>3. Player3 - 800점</li>
+                    <li>1. Player1 - 1000 pts</li>
+                    <li>2. Player2 - 900 pts</li>
+                    <li>3. Player3 - 800 pts</li>
                 </ul>
             </div>
         `;
@@ -117,6 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.logout').addEventListener('click', createLoginScene);
     }
 
-    // 초기 씬 설정
+    // Initial scene setup
     createLoginScene();
 });

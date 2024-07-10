@@ -131,12 +131,18 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 70%;
+    width: 80%;  /* 70%에서 80%로 증가 */
     margin: 20px auto;
 }
 
+.press-arrow-image {
+    width: 20%;  /* 또는 적절한 크기로 조정 */
+    height: auto;
+    margin-right: 10px;  /* 오른쪽 여백 추가 */
+}
+
 .arrow-image {
-    width: 30%;
+    width: 20%;  /* 30%에서 20%로 감소 */
     height: auto;
     margin: 0 1.5%;
 }
