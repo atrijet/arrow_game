@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Arrow Key Game</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100vh;
+            background-color: white;
+        }
+        .container {
+            width: 100%;
+            max-width: 390px; /* iPhone 14 width */
+            height: 70%; /* Adjusted to 70% height */
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Adjusted to fit buttons at the bottom */
+        }
+        .arrowContainer {
+            font-size: 35px; /* Slightly reduced font size */
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .arrow {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            padding: 5px;
+            border-radius: 5px;
+            font-weight: bold;
+            line-height: 40px; /* Adjusted line height */
+            vertical-align: middle; /* Center text vertically */
+            box-sizing: border-box;
+            text-align: center; /* Center text horizontally */
+        }
+        .arrow-left {
+            background-color: #ffcccc;
+        }
+        .arrow-down {
+            background-color: #ccccff;
+        }
+        .arrow-right {
+            background-color: #ccffcc;
+        }
+        .indicator {
+            font-size: 35px;
+            margin-right: 10px;
+        }
+        #score, #message, #finalScore, #ranking, #rankingContainer {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        #rankingContainer {
+            height: 100px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+        }
+        .hidden {
+            display: none;
+        }
+        .button {
+            font-size: 24px;
+            padding: 10px 20px;
+            margin: 10px;
+        }
+        .highlight-correct {
+            background-color: lightgreen;
+            transition: background-color 0.7s;
+        }
+        .highlight-wrong {
+            background-color: lightcoral;
+            transition: background-color 0.7s;
+        }
+        .highlight-rank {
+            background-color: lightgreen;
+            animation: blink 2s 0.2s infinite alternate;
+        }
+        @keyframes blink {
+            0%, 100% { background-color: lightgreen; }
+            50% { background-color: white; }
+        }
+        @keyframes flashRed {
+            0%, 100% { background-color: rgb(255, 0, 0); }
+            50% { background-color: inherit; }
+        }
+        .flash-red {
+            animation: flashRed 0.1s ease;
+        }
+        #nameInputSection {
+            margin-top: 20px;
+        }
+        #rankingList {
+            list-style: none; /* Hide the default list numbering */
+            padding: 0;
+            text-align: left;
+            margin: 0 auto;
+            max-width: 200px;
+        }
+        .sound-control {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .progress {
+            width: 80%;
+            height: 30px;
+            background-color: #f3f3f3;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 20px auto;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #ffeb3b);
+            border-radius: 5px;
+            transition: width 0.2s ease;
+        }
+        .progress-bar-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: bold;
+        }
+        .arrow-buttons {
+            display: flex;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        .arrow-button {
+            flex: 1;
+            height: 60px; /* Fixed height to maintain square shape */
+            font-size: 30px; /* Larger font size for buttons */
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .arrow-button-left {
+            background-color: #ffcccc;
+        }
+        .arrow-button-down {
+            background-color: #ccccff;
+        }
+        .arrow-button-right {
+            background-color: #ccffcc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Arrow Key Game</h1>
+        <div id="nameInputSection">
+            <label for="nameInput">Enter your name: </label>
+            <input type="text" id="nameInput">
+            <button id="submitNameButton" class="button">Submit</button>
+        </div>
+        <button id="startButton" class="button hidden">Start Game</button>
+        <div id="instructions" class="hidden">Press Space Bar to Start Game</div>
+        <div class="sound-control">
+            <input type="checkbox" id="soundToggle">
+            <label for="soundToggle" id="soundLabel">Sound off</label>
+        </div>
+        <div id="gameArea" class="hidden">
+            <div class="arrowContainer" id="arrowContainer">
+                <div class="indicator" id="indicator">☞</div>
+            </div>
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar"></div>
+                <div class="progress-bar-text" id="progress-bar-text">10.00</div>
+            </div>
+            <div id="score">Score: 0</div>
+            <div id="message"></div>
+            <div id="timeChangeMessage"></div>
+        </div>
+        <div id="finalScore" class="hidden"></div>
+        <button id="restartButton" class="button hidden">Restart Game</button>
+        <div id="ranking">
+            <h2>Ranking</h2>
+            <div id="rankingContainer">
+                <ol id="rankingList"></ol>
+            </div>
+        </div>
+        <div class="arrow-buttons hidden">
+            <button class="arrow-button arrow-button-left">←</button>
+            <button class="arrow-button arrow-button-down">↓</button>
+            <button class="arrow-button arrow-button-right">→</button>
+        </div>
+    </div>
+
+    <!-- Correct and Wrong sound effects -->
+    <audio id="correctSound" src="https://www.soundjay.com/buttons/beep-08b.mp3"></audio>
+    <audio id="wrongSound" src="https://www.soundjay.com/buttons/beep-03.mp3"></audio>
+
+    <script>
+        // Configuration values
+        const CONFIG = {
+            initialTimeLeft: 10, // Initial time limit
+            timeDecrement: 0.3, // Time decrease on wrong input
+            initialTimeIncrement: 1, // Initial time increment on correct inputs
+            timeIncrementDecrement: 0.1, // Decrease in time increment per incorrect input
+            timeIncrementReductionOnAdd: 0.03, // Decrease in time increment per correct series addition
+            requiredCorrectCount: 5, // Number of correct inputs required for time increment
+            correctSoundUrl: "https://www.soundjay.com/buttons/beep-08b.mp3", // Correct sound URL
+            wrongSoundUrl: "https://www.soundjay.com/buttons/beep-03.mp3", // Wrong sound URL
+            bgColorOver5Sec: 'white', // Background color for time > 5s
+            bgColor5To3Sec: 'rgb(255, 234, 234)', // Background color for 5s > time >= 3s
+            bgColor3To1Sec: 'rgb(252, 179, 179)', // Background color for 3s > time >= 1s
+            bgColorUnder1Sec: 'rgb(252, 130, 130)', // Background color for time < 1s
+            bgColorGameOver: 'rgb(20, 0, 0)', // Background color for game over
+        };
+
+        let playerName = '';
+        let arrowSequence = [];
+        let score = 0;
+        let correctClicks = [];
+        let gameInterval;
+        let timerInterval;
+        let timeLeft = CONFIG.initialTimeLeft;
+        let gameStarted = false;
+        let recentCorrectCount = 0; // To count recent correct inputs in the last second
+        let timeIncrement = CONFIG.initialTimeIncrement; // Initial time increment
+        let soundEnabled = false; // Variable to track sound state
+
+        const arrows = ['←', '→', '↓']; // Removed the '↑' arrow
+        const nameInputSection = document.getElementById('nameInputSection');
+        const nameInput = document.getElementById('nameInput');
+        const submitNameButton = document.getElementById('submitNameButton');
+        const startButton = document.getElementById('startButton');
+        const restartButton = document.getElementById('restartButton');
+        const instructions = document.getElementById('instructions');
+        const gameArea = document.getElementById('gameArea');
+        const finalScoreElement = document.getElementById('finalScore');
+        const messageElement = document.getElementById('message');
+        const timeChangeMessage = document.getElementById('timeChangeMessage');
+        const rankingList = document.getElementById('rankingList');
+        const rankingContainer = document.getElementById('rankingContainer');
+        const soundToggle = document.getElementById('soundToggle');
+        const soundLabel = document.getElementById('soundLabel');
+        const indicator = document.getElementById('indicator');
+        const progressBar = document.getElementById('progress-bar');
+        const progressBarText = document.getElementById('progress-bar-text');
+        const arrowButtons = document.querySelector('.arrow-buttons');
+
+        soundToggle.addEventListener('change', function () {
+            soundEnabled = this.checked;
+            soundLabel.innerText = soundEnabled ? 'Sound on' : 'Sound off';
+        });
+
+        function generateRandomArrow() {
+            return arrows[Math.floor(Math.random() * arrows.length)];
+        }
+
+        function initializeArrows() {
+            arrowSequence = [];
+            for (let i = 0; i < 6; i++) { // 6 arrows instead of 4
+                arrowSequence.push(generateRandomArrow());
+            }
+            updateArrows();
+        }
+
+        function updateArrows() {
+            arrowContainer.innerHTML = '<div class="indicator" id="indicator">☞</div>';
+            for (let i = 0; i < arrowSequence.length; i++) {
+                const arrowElement = document.createElement('span');
+                arrowElement.textContent = arrowSequence[i];
+                arrowElement.classList.add('arrow');
+                if (arrowSequence[i] === '←') {
+                    arrowElement.classList.add('arrow-left');
+                } else if (arrowSequence[i] === '→') {
+                    arrowElement.classList.add('arrow-right');
+                } else if (arrowSequence[i] === '↓') {
+                    arrowElement.classList.add('arrow-down');
+                }
+                arrowContainer.appendChild(arrowElement);
+            }
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('score').innerText = 'Score: ' + score;
+        }
+
+        function highlightTimerCorrect() {
+            messageElement.classList.add('highlight-correct');
+            setTimeout(() => {
+                messageElement.classList.remove('highlight-correct');
+            }, 700);
+        }
+
+        function highlightTimerWrong() {
+            messageElement.classList.add('highlight-wrong');
+            setTimeout(() => {
+                messageElement.classList.remove('highlight-wrong');
+            }, 700);
+        }
+
+        function playSound(url) {
+            if (soundEnabled) {
+                const audio = new Audio(url);
+                audio.play();
+            }
+        }
+
+        function showTimeChangeMessage(message) {
+            timeChangeMessage.innerText = message;
+            setTimeout(() => {
+                timeChangeMessage.innerText = '';
+            }, 700);
+        }
+
+        function handleArrowInput(arrow) {
+            if (!gameStarted) return;
+
+            const leftMostArrow = arrowSequence[0];
+            let isCorrect = false;
+
+            if (arrow === leftMostArrow) {
+                isCorrect = true;
+            }
+
+            if (isCorrect) {
+                score++;
+                correctClicks.push(Date.now());
+                recentCorrectCount++;
+                arrowSequence.shift(); // Remove the leftmost arrow
+                arrowSequence.push(generateRandomArrow()); // Add a new random arrow to the end
+                messageElement.textContent = 'Correct!';
+                playSound(CONFIG.correctSoundUrl);
+                if (recentCorrectCount >= CONFIG.requiredCorrectCount) {
+                    messageElement.textContent = 'Excellent!!!';
+                    timeLeft = Math.min(timeLeft + timeIncrement, CONFIG.initialTimeLeft); // Ensure timeLeft does not exceed initialTimeLeft
+                    showTimeChangeMessage('Time extended!!!');
+                    timeIncrement = Math.max(timeIncrement - CONFIG.timeIncrementReductionOnAdd, 0); // Decrease time increment by 0.03, minimum 0
+                    recentCorrectCount = 0; // Reset the recent correct count
+                    updateTimerDisplay(); // Update the timer display
+                    highlightTimerCorrect();
+                }
+            } else {
+                score -= 3;
+                timeLeft = Math.max(timeLeft - CONFIG.timeDecrement, 0); // Decrease time by 0.3 seconds, minimum 0
+                messageElement.textContent = 'Wrong! Try again.';
+                showTimeChangeMessage('Time decreased..');
+                playSound(CONFIG.wrongSoundUrl);
+                highlightTimerWrong();
+                timeIncrement = Math.max(timeIncrement - CONFIG.timeIncrementDecrement, 0); // Decrease time increment by 0.1, minimum 0
+
+                // Flash screen red
+                document.body.classList.add('flash-red');
+                setTimeout(() => {
+                    document.body.classList.remove('flash-red');
+                }, 100);
+            }
+            updateScoreDisplay();
+            updateArrows();
+        }
+
+        function handleKeyPress(event) {
+            if (!gameStarted) return;
+
+            const key = event.key;
+
+            if (key === 'ArrowLeft') {
+                handleArrowInput('←');
+            } else if (key === 'ArrowRight') {
+                handleArrowInput('→');
+            } else if (key === 'ArrowDown') {
+                handleArrowInput('↓');
+            }
+        }
+
+        function startGame() {
+            score = 0;
+            correctClicks = [];
+            timeLeft = CONFIG.initialTimeLeft;
+            recentCorrectCount = 0;
+            timeIncrement = CONFIG.initialTimeIncrement; // Reset the time increment
+            gameStarted = true;
+            gameArea.classList.remove('hidden');
+            arrowButtons.classList.remove('hidden');
+            startButton.classList.add('hidden');
+            instructions.classList.add('hidden');
+            finalScoreElement.classList.add('hidden');
+            restartButton.classList.add('hidden');
+            indicator.innerText = "☞";
+            updateScoreDisplay();
+            initializeArrows();
+            updateTimerDisplay();
+
+            gameInterval = setInterval(updateTimerDisplay, 100);
+            timerInterval = setInterval(updateTimer, 100);
+        }
+
+        function endGame() {
+            gameStarted = false;
+            clearInterval(gameInterval);
+            clearInterval(timerInterval);
+            saveScore(playerName, score);
+            finalScoreElement.innerText = 'Final Score: ' + score;
+            finalScoreElement.classList.remove('hidden');
+            restartButton.classList.remove('hidden');
+            displayRanking();
+            arrowButtons.classList.add('hidden');
+            timeLeft = 0;
+            updateTimerDisplay();
+            document.body.style.transition = 'filter 0s, background-color 3s';
+            document.body.style.filter = 'brightness(0%)';
+            setTimeout(() => {
+                document.body.style.filter = 'brightness(100%)';
+                document.body.style.backgroundColor = CONFIG.bgColorOver5Sec;
+            }, 3000);
+            indicator.innerText = "☞";
+        }
+
+        function updateTimer() {
+            timeLeft -= 0.1;
+            updateTimerDisplay();
+            if (timeLeft <= 0) {
+                endGame();
+            }
+            updateBackgroundColor();
+        }
+
+        function updateTimerDisplay() {
+            progressBar.style.width = Math.min(timeLeft / CONFIG.initialTimeLeft * 100, 100) + '%';
+            progressBarText.innerText = timeLeft.toFixed(2);
+        }
+
+        function updateBackgroundColor() {
+            if (timeLeft >= 5) {
+                document.body.style.backgroundColor = CONFIG.bgColorOver5Sec;
+            } else if (timeLeft >= 3) {
+                document.body.style.backgroundColor = CONFIG.bgColor5To3Sec;
+            } else if (timeLeft >= 1) {
+                document.body.style.backgroundColor = CONFIG.bgColor3To1Sec;
+            } else {
+                document.body.style.backgroundColor = CONFIG.bgColorUnder1Sec;
+            }
+        }
+
+        function saveScore(name, score) {
+            const ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+            ranking.push({ name, score });
+            ranking.sort((a, b) => b.score - a.score);
+            if (ranking.length > 10) ranking.pop();
+            localStorage.setItem('ranking', JSON.stringify(ranking));
+        }
+
+        function displayRanking() {
+            const ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+            rankingList.innerHTML = '';
+            ranking.forEach((entry, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${entry.name}: ${entry.score}`;
+                rankingList.appendChild(li);
+
+                if (entry.name === playerName && entry.score === score) {
+                    li.classList.add('highlight-rank');
+                    setTimeout(() => {
+                        li.classList.remove('highlight-rank');
+                    }, 2000);
+                }
+            });
+        }
+
+        submitNameButton.addEventListener('click', () => {
+            playerName = nameInput.value.trim();
+            if (playerName) {
+                nameInputSection.classList.add('hidden');
+                startButton.classList.remove('hidden');
+                instructions.classList.remove('hidden');
+                displayRanking();
+            }
+        });
+
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === ' ' && !gameStarted) {
+                startGame();
+            } else {
+                handleKeyPress(event);
+            }
+        });
+
+        document.querySelector('.arrow-button-left').addEventListener('click', () => handleArrowInput('←'));
+        document.querySelector('.arrow-button-down').addEventListener('click', () => handleArrowInput('↓'));
+        document.querySelector('.arrow-button-right').addEventListener('click', () => handleArrowInput('→'));
+    </script>
+</body>
+</html>

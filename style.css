@@ -32,11 +32,17 @@ body {
 }
 
 .game-content {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.5);
     padding: 20px;
     border-radius: 10px;
     text-align: center;
     margin-top: 35px;
+    margin-bottom: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
 }
 
 .nickname {
@@ -131,23 +137,96 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 80%;  /* 70%에서 80%로 증가 */
+    width: 80%;
     margin: 20px auto;
 }
 
 .press-arrow-image {
-    width: 20%;  /* 또는 적절한 크기로 조정 */
+    width: 20%;
     height: auto;
-    margin-right: 10px;  /* 오른쪽 여백 추가 */
+    margin-right: 10px;
 }
 
 .arrow-image {
-    width: 20%;  /* 30%에서 20%로 감소 */
+    width: 20%;
     height: auto;
     margin: 0 1.5%;
 }
 
 #countdown {
     font-size: 48px;
+    font-weight: bold;
+}
+
+.arrow-buttons {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.arrow-button {
+    width: 60%;
+    max-width: 200px;
+    margin: 0 10px;
+    padding: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.arrow-button img {
+    width: 100%;
+    height: auto;
+}
+
+#arrow-sequence {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.sequence-image {
+    width: 50px;
+    height: 50px;
+    margin: 0 5px;
+}
+
+#result-text {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+#time-bar-container {
+    width: 80%;
+    height: 20px;
+    background-color: #ddd;
+    margin: 10px auto;
+    position: relative;
+}
+
+#time-bar {
+    width: 100%;
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.1s linear;
+}
+
+#time-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
     font-weight: bold;
 }

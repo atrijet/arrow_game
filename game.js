@@ -1,6 +1,48 @@
 document.addEventListener('DOMContentLoaded', () => {
     const gameContainer = document.getElementById('game-container');
     let nickname = '';
+    let score = 0;
+    let timeLeft = 0;
+    let timeIncrement = 0;
+    let correctCount = 0;
+    let lastCorrectTime = 0;
+    let isGameActive = false;
+
+    function resetAllVariables() {
+        nickname = '';
+        resetGameVariables();
+    }
+
+    function resetGameVariables() {
+        score = 0;
+        timeLeft = gameConfig.initialTimeLeft;
+        timeIncrement = gameConfig.initialTimeIncrement;
+        correctCount = 0;
+        lastCorrectTime = 0;
+        isGameActive = false;
+    }
+
+    function saveRanking(nickname, score) {
+        let rankings = JSON.parse(localStorage.getItem('arrowGameRankings')) || [];
+        rankings.push({nickname, score});
+        rankings.sort((a, b) => b.score - a.score);
+        rankings = rankings.slice(0, 5);  // 상위 5개만 유지
+        localStorage.setItem('arrowGameRankings', JSON.stringify(rankings));
+    }
+
+    function getRankings() {
+        return JSON.parse(localStorage.getItem('arrowGameRankings')) || [];
+    }
+
+    function updateRankingDisplay() {
+        const rankings = getRankings();
+        const rankingList = document.querySelector('.ranking-list');
+        if (rankingList) {
+            rankingList.innerHTML = rankings.map((rank, index) => 
+                `<li>${index + 1}. ${rank.nickname} - ${rank.score} pts</li>`
+            ).join('');
+        }
+    }
 
     function createLoginScene() {
         gameContainer.className = 'login-scene';
@@ -41,38 +83,55 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="ranking-container">
                 <h3>Ranking</h3>
-                <ul class="ranking-list">
-                    <li>1. Player1 - 1000 pts</li>
-                    <li>2. Player2 - 900 pts</li>
-                    <li>3. Player3 - 800 pts</li>
-                </ul>
+                <ul class="ranking-list"></ul>
             </div>
         `;
 
         document.querySelector('.ranking-container').style.display = 'flex';
+        updateRankingDisplay();
         document.getElementById('game-start-button').addEventListener('click', createPlayScene);
-        document.querySelector('.logout').addEventListener('click', createLoginScene);
+        document.querySelector('.logout').addEventListener('click', () => {
+            resetAllVariables();
+            createLoginScene();
+        });
     }
 
     function createPlayScene() {
+        resetGameVariables();
         gameContainer.className = 'other-scene';
         gameContainer.innerHTML = `
             <div class="nickname">${nickname}</div>
             <div class="scene-title">Game Play</div>
-            <button class="logout">Log out</button>
+            <button class="logout" style="display: none;">Log out</button>
             <div class="game-content">
                 <div id="countdown">3</div>
-                <h2 id="game-status" style="display: none;">Game in progress</h2>
-                <button id="end-game-button" style="display: none;">End Game</button>
+                <div id="result-text" style="display: none;"></div>
+                <div id="arrow-sequence" style="display: none;"></div>
+                <div id="time-bar-container" style="display: none;">
+                    <div id="time-bar"></div>
+                    <div id="time-left"></div>
+                </div>
             </div>
+            <div class="arrow-buttons">
+                <button class="arrow-button" id="left-arrow"><img src="images/arrow_left.png" alt="Left"></button>
+                <button class="arrow-button" id="down-arrow"><img src="images/arrow_down.png" alt="Down"></button>
+                <button class="arrow-button" id="right-arrow"><img src="images/arrow_right.png" alt="Right"></button>
+            </div>
+            <div id="overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none;"></div>
         `;
 
-        document.querySelector('.logout').addEventListener('click', createLoginScene);
+        document.querySelector('.logout').addEventListener('click', () => {
+            resetAllVariables();
+            createLoginScene();
+        });
 
         let countdown = 3;
         const countdownElement = document.getElementById('countdown');
-        const gameStatusElement = document.getElementById('game-status');
-        const endGameButton = document.getElementById('end-game-button');
+        const arrowSequenceElement = document.getElementById('arrow-sequence');
+        const resultTextElement = document.getElementById('result-text');
+        const timeBarElement = document.getElementById('time-bar');
+        const timeLeftElement = document.getElementById('time-left');
+        const timeBarContainerElement = document.getElementById('time-bar-container');
 
         const countdownInterval = setInterval(() => {
             countdown--;
@@ -81,15 +140,144 @@ document.addEventListener('DOMContentLoaded', () => {
             if (countdown === 0) {
                 clearInterval(countdownInterval);
                 countdownElement.style.display = 'none';
-                gameStatusElement.style.display = 'block';
-                endGameButton.style.display = 'block';
+                arrowSequenceElement.style.display = 'flex';
+                resultTextElement.style.display = 'block';
                 startGame();
             }
         }, 1000);
 
+        let timerInterval;
+
         function startGame() {
-            // Add game start logic here
-            endGameButton.addEventListener('click', createEndScene);
+            generateArrowSequence();
+            timeBarContainerElement.style.display = 'block';
+            
+            isGameActive = true;
+            
+            document.addEventListener('keydown', handleKeyDown);
+            document.getElementById('left-arrow').addEventListener('click', () => {
+                if (isGameActive) handleArrowInput('arrow_left.png');
+            });
+            document.getElementById('down-arrow').addEventListener('click', () => {
+                if (isGameActive) handleArrowInput('arrow_down.png');
+            });
+            document.getElementById('right-arrow').addEventListener('click', () => {
+                if (isGameActive) handleArrowInput('arrow_right.png');
+            });
+
+            timerInterval = setInterval(() => {
+                timeLeft -= 0.01;
+                updateTimeBar();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 10);
+        }
+
+        function handleKeyDown(event) {
+            if (isGameActive) {
+                if (event.key === 'ArrowLeft') handleArrowInput('arrow_left.png');
+                if (event.key === 'ArrowDown') handleArrowInput('arrow_down.png');
+                if (event.key === 'ArrowRight') handleArrowInput('arrow_right.png');
+            }
+        }
+
+        function updateTimeBar() {
+            const percentage = (timeLeft / gameConfig.initialTimeLeft) * 100;
+            timeBarElement.style.width = `${percentage}%`;
+            timeLeftElement.textContent = timeLeft.toFixed(2);
+
+            if (timeLeft > 6) {
+                gameContainer.style.backgroundColor = 'white';
+            } else if (timeLeft > 4) {
+                gameContainer.style.backgroundColor = gameConfig.bgColor5To3Sec;
+            } else if (timeLeft > 1) {
+                gameContainer.style.backgroundColor = gameConfig.bgColor3To1Sec;
+            } else {
+                gameContainer.style.backgroundColor = gameConfig.bgColorUnder1Sec;
+            }
+        }
+
+        let arrowSequence = [];
+
+        function generateArrowSequence() {
+            const arrows = ['arrow_left.png', 'arrow_down.png', 'arrow_right.png'];
+            let sequence = '<img src="images/press_arrow.png" alt="Press Arrow" class="sequence-image">';
+            arrowSequence = [];
+            
+            for (let i = 0; i < 7; i++) {
+                const randomArrow = arrows[Math.floor(Math.random() * arrows.length)];
+                arrowSequence.push(randomArrow);
+                sequence += `<img src="images/${randomArrow}" alt="Arrow" class="sequence-image">`;
+            }
+            
+            arrowSequenceElement.innerHTML = sequence;
+        }
+
+        function handleArrowInput(input) {
+            if (isGameActive && arrowSequence.length > 0) {
+                if (input === arrowSequence[0]) {
+                    resultTextElement.textContent = "Correct";
+                    resultTextElement.style.color = "green";
+                    arrowSequence.shift();
+                    const newArrow = ['arrow_left.png', 'arrow_down.png', 'arrow_right.png'][Math.floor(Math.random() * 3)];
+                    arrowSequence.push(newArrow);
+                    updateArrowSequence();
+                    score++;
+                    correctCount++;
+
+                    const currentTime = Date.now() / 1000;
+                    if (currentTime - lastCorrectTime <= 1 && correctCount >= gameConfig.requiredCorrectCount) {
+                        timeLeft += timeIncrement;
+                        if (timeLeft < 1.5) {
+                            timeIncrement += gameConfig.timeIncrementReductionOnAdd * 2;
+                        } else {
+                            timeIncrement = Math.max(0, timeIncrement - gameConfig.timeIncrementReductionOnAdd);
+                        }
+                        correctCount = 0;
+                    }
+                    lastCorrectTime = currentTime;
+                } else {
+                    resultTextElement.textContent = "Wrong";
+                    resultTextElement.style.color = "red";
+                    timeLeft = Math.max(0, timeLeft - gameConfig.timeDecrement);
+                    timeIncrement = Math.max(0, timeIncrement - gameConfig.timeIncrementDecrement);
+                    correctCount = 0;
+
+                    const overlay = document.getElementById('overlay');
+                    overlay.style.transition = 'none';
+                    overlay.style.backgroundColor = gameConfig.bgColorUnder1Sec;
+                    overlay.style.opacity = '1';
+                    
+                    overlay.offsetHeight;
+
+                    overlay.style.transition = 'opacity 0.3s';
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                    }, 10);
+                }
+                updateTimeBar();
+            }
+        }
+
+        function updateArrowSequence() {
+            let sequence = '<img src="images/press_arrow.png" alt="Press Arrow" class="sequence-image">';
+            arrowSequence.forEach(arrow => {
+                sequence += `<img src="images/${arrow}" alt="Arrow" class="sequence-image">`;
+            });
+            arrowSequenceElement.innerHTML = sequence;
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            isGameActive = false;
+            document.removeEventListener('keydown', handleKeyDown);
+            gameContainer.style.backgroundColor = 'white';
+            document.querySelector('.logout').style.display = 'block';
+            saveRanking(nickname, score);
+            createEndScene();
         }
     }
 
@@ -101,23 +289,26 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="logout">Log out</button>
             <div class="game-content">
                 <h2>Game Over</h2>
+                <p>Your score: ${score}</p>
                 <button id="restart-button">Restart</button>
             </div>
             <div class="ranking-container">
                 <h3>Ranking</h3>
-                <ul class="ranking-list">
-                    <li>1. Player1 - 1000 pts</li>
-                    <li>2. Player2 - 900 pts</li>
-                    <li>3. Player3 - 800 pts</li>
-                </ul>
+                <ul class="ranking-list"></ul>
             </div>
         `;
 
         document.querySelector('.ranking-container').style.display = 'flex';
-        document.getElementById('restart-button').addEventListener('click', createPlayScene);
-        document.querySelector('.logout').addEventListener('click', createLoginScene);
+        updateRankingDisplay();
+        document.getElementById('restart-button').addEventListener('click', () => {
+            resetGameVariables();
+            createPlayScene();
+        });
+        document.querySelector('.logout').addEventListener('click', () => {
+            resetAllVariables();
+            createLoginScene();
+        });
     }
 
-    // Initial scene setup
     createLoginScene();
 });
