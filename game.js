@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createPlayScene() {
         resetGameVariables();
+        window.addEventListener('resize', updateArrowSequence);
         gameContainer.className = 'other-scene';
         gameContainer.innerHTML = `
             <div class="nickname">${nickname}</div>
@@ -150,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function startGame() {
             generateArrowSequence();
+            updateArrowSequence();
             timeBarContainerElement.style.display = 'block';
             
             isGameActive = true;
@@ -217,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         function updateArrowSequence() {
-            const containerWidth = arrowSequenceElement.offsetWidth;
+            const containerWidth = gameContainer.offsetWidth;
             const imageCount = gameConfig.arrowSequenceLength + 1; // +1 for the 'press arrow' image
             const imageWidth = Math.floor(containerWidth / imageCount) - 10; // 10px for margin
         
@@ -228,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             arrowSequenceElement.innerHTML = sequence;
         }
-        
+
         function handleArrowInput(input) {
             if (isGameActive && arrowSequence.length > 0) {
                 if (input === arrowSequence[0]) {
