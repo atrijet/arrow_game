@@ -174,6 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     endGame();
                 }
             }, 10);
+
+            window.addEventListener('resize', updateArrowSequence);
         }
 
         function handleKeyDown(event) {
@@ -204,14 +206,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function generateArrowSequence() {
             const arrows = ['arrow_left.png', 'arrow_down.png', 'arrow_right.png'];
-            let sequence = '<img src="images/press_arrow.png" alt="Press Arrow" class="sequence-image">';
             arrowSequence = [];
             
             for (let i = 0; i < 7; i++) {
                 const randomArrow = arrows[Math.floor(Math.random() * arrows.length)];
                 arrowSequence.push(randomArrow);
-                sequence += `<img src="images/${randomArrow}" alt="Arrow" class="sequence-image">`;
             }
+            
+            updateArrowSequence();
+        }
+
+        function updateArrowSequence() {
+            const containerWidth = arrowSequenceElement.offsetWidth;
+            const imageCount = arrowSequence.length + 1; // +1 for the 'press arrow' image
+            const imageWidth = Math.floor(containerWidth / imageCount) - 10; // 10px for margin
+
+            let sequence = `<img src="images/press_arrow.png" alt="Press Arrow" class="sequence-image" style="width:${imageWidth}px;height:${imageWidth}px;margin:0 5px;">`;
+            arrowSequence.forEach(arrow => {
+                sequence += `<img src="images/${arrow}" alt="Arrow" class="sequence-image" style="width:${imageWidth}px;height:${imageWidth}px;margin:0 5px;">`;
+            });
             
             arrowSequenceElement.innerHTML = sequence;
         }
@@ -262,18 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        function updateArrowSequence() {
-            let sequence = '<img src="images/press_arrow.png" alt="Press Arrow" class="sequence-image">';
-            arrowSequence.forEach(arrow => {
-                sequence += `<img src="images/${arrow}" alt="Arrow" class="sequence-image">`;
-            });
-            arrowSequenceElement.innerHTML = sequence;
-        }
-
         function endGame() {
             clearInterval(timerInterval);
             isGameActive = false;
             document.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('resize', updateArrowSequence);
             gameContainer.style.backgroundColor = 'white';
             document.querySelector('.logout').style.display = 'block';
             saveRanking(nickname, score);

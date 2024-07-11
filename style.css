@@ -3,11 +3,14 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
 }
 
 body {
     font-family: Arial, sans-serif;
-    touch-action: auto;
+    touch-action: none;
 }
 
 #game-container {
@@ -124,6 +127,8 @@ button:hover {
     width: 90%;
     list-style-type: none;
     padding: 0;
+    margin: 0 auto;
+    text-align: center;
 }
 
 .ranking-list li {
@@ -189,6 +194,8 @@ button:hover {
     justify-content: center;
     align-items: center;
     margin-top: 20px;
+    width: 100%;
+    overflow: hidden;
 }
 
 .sequence-image {
