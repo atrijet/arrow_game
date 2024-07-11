@@ -208,19 +208,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const arrows = ['arrow_left.png', 'arrow_down.png', 'arrow_right.png'];
             arrowSequence = [];
             
-            for (let i = 0; i < 7; i++) {
+            for (let i = 0; i < gameConfig.arrowSequenceLength; i++) {
                 const randomArrow = arrows[Math.floor(Math.random() * arrows.length)];
                 arrowSequence.push(randomArrow);
             }
             
             updateArrowSequence();
         }
-
+        
         function updateArrowSequence() {
             const containerWidth = arrowSequenceElement.offsetWidth;
-            const imageCount = arrowSequence.length + 1; // +1 for the 'press arrow' image
+            const imageCount = gameConfig.arrowSequenceLength + 1; // +1 for the 'press arrow' image
             const imageWidth = Math.floor(containerWidth / imageCount) - 10; // 10px for margin
-
+        
             let sequence = `<img src="images/press_arrow.png" alt="Press Arrow" class="sequence-image" style="width:${imageWidth}px;height:${imageWidth}px;margin:0 5px;">`;
             arrowSequence.forEach(arrow => {
                 sequence += `<img src="images/${arrow}" alt="Arrow" class="sequence-image" style="width:${imageWidth}px;height:${imageWidth}px;margin:0 5px;">`;
@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             arrowSequenceElement.innerHTML = sequence;
         }
-
+        
         function handleArrowInput(input) {
             if (isGameActive && arrowSequence.length > 0) {
                 if (input === arrowSequence[0]) {

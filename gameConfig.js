@@ -12,6 +12,7 @@ const gameConfig = {
     bgColor3To1Sec: 'rgb(252, 179, 179)', // Background color for 3s > time >= 1s
     bgColorUnder1Sec: 'rgb(252, 130, 130)', // Background color for time < 1s
     bgColorGameOver: 'rgb(20, 0, 0)', // Background color for game over
+    arrowSequenceLength: 5,  // 새로 추가된 변수
 
     // 이전에 정의한 설정들도 유지합니다
     countdownTime: 3,
