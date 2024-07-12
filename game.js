@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    
+
     function createLoginScene() {
         gameContainer.className = 'login-scene';
         gameContainer.innerHTML = `
@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         document.querySelector('.ranking-container').style.display = 'flex';
-        saveRanking(nickname, score);
+
         updateRankingDisplay();
         document.getElementById('restart-button').addEventListener('click', () => {
             resetGameVariables();
