@@ -3,22 +3,6 @@ import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } fro
 const database = getDatabase();
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 전체 문서에 대한 터치 이벤트 방지
-    document.addEventListener('touchmove', function(e) {
-        if (e.target.closest('.ranking-container') === null) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    // 더블탭 줌 방지
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function(e) {
-        const now = (new Date()).getTime();
-        if (now - lastTouchEnd <= 300) {
-            e.preventDefault();
-        }
-        lastTouchEnd = now;
-    }, false);
 
     // 핀치 줌 방지
     document.addEventListener('gesturestart', function(e) {
