@@ -30,13 +30,23 @@ body {
     background-image: url('images/world_of_arrows_op60.png');
 }
 
-.login-scene .ranking-container {
-    position: static;
+.ranking-container {
     width: 100%;
-    margin-top: 20px;
+    max-width: 300px;
+    margin: 20px auto;
     background-color: rgba(255, 255, 255, 0.8);
-    padding: 10px;
+    padding: 15px;
     border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.login-scene .ranking-container,
+.other-scene .ranking-container {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
 }
 
 .login-scene .ranking-list {
@@ -255,4 +265,22 @@ button:hover {
     justify-content: center;
     color: black;
     font-weight: bold;
+}
+
+.ranking-item.highlight {
+    background-color: #90EE90;  /* 연두색 */
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        background-color: #90EE90;
+    }
+    50% {
+        background-color: #ADFFAD;
+    }
+    100% {
+        background-color: #90EE90;
+    }
 }

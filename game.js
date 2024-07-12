@@ -55,18 +55,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateRankingDisplay() {
+        console.log("Updating ranking display");
         getRankings((rankings) => {
+            console.log("Rankings received:", rankings);
             const rankingList = document.querySelector('.ranking-list');
             if (rankingList) {
-                rankingList.innerHTML = rankings.map((rank, index) => 
-                    `<li>${index + 1}. ${rank.nickname} - ${rank.score} pts</li>`
-                ).join('');
+                if (rankings.length > 0) {
+                    rankingList.innerHTML = rankings.map((rank, index) => {
+                        const isCurrentPlayer = (rank.nickname === nickname && rank.score === score);
+                        const highlightClass = isCurrentPlayer ? 'highlight' : '';
+                        return `<li class="ranking-item ${highlightClass}">${index + 1}. ${rank.nickname} - ${rank.score} pts</li>`;
+                    }).join('');
+                } else {
+                    rankingList.innerHTML = "<li class='ranking-item'>No rankings available yet</li>";
+                }
+            } else {
+                console.error("Ranking list element not found");
             }
         });
     }
 
 
     function createLoginScene() {
+        console.log("Creating login scene");
         gameContainer.className = 'login-scene';
         gameContainer.innerHTML = `
             <div class="scene-title">Login</div>
@@ -82,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button id="start-button">Start</button>
             </div>
             <div class="ranking-container">
-                <h3>Top 5 Rankings</h3>
+                <h3 class="ranking-title">Top 5 Rankings</h3>
                 <ul class="ranking-list"></ul>
             </div>
         `;
@@ -97,9 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     
         // 랭킹 표시 업데이트
+        document.querySelector('.ranking-container').style.display = 'flex';
         updateRankingDisplay();
     }
-    
+
     function createReadyScene() {
         gameContainer.className = 'other-scene';
         gameContainer.innerHTML = `
