@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.innerHTML = `
             <div class="scene-title">Login</div>
             <div class="game-content">
-                <h1>Arrow Input Game</h1>
+                <h1 class="game-title">Arrow Input Game</h1>
                 <div class="arrow-container">
                     <img src="images/press_arrow.png" alt="Press Arrow" class="press-arrow-image">
                     <img src="images/arrow_left.png" alt="Left Arrow" class="arrow-image">
