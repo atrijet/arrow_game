@@ -4,19 +4,6 @@ const database = getDatabase();
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 핀치 줌 방지
-    document.addEventListener('gesturestart', function(e) {
-        e.preventDefault();
-    });
-    
-    // ranking-container에 대한 특별 처리
-    const rankingContainer = document.querySelector('.ranking-container');
-    if (rankingContainer) {
-        rankingContainer.addEventListener('touchmove', function(e) {
-            e.stopPropagation();
-        }, { passive: true });
-    }
-
     // 화면 크기 변경 방지
     function preventZoom(e) {
         if (e.touches.length > 1) {
@@ -24,9 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    document.addEventListener('touchstart', preventZoom, { passive: false });
-    document.addEventListener('touchmove', preventZoom, { passive: false });
-    
     const gameContainer = document.getElementById('game-container');
     let nickname = '';
     let score = 0;
