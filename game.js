@@ -3,6 +3,46 @@ import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } fro
 const database = getDatabase();
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 전체 문서에 대한 터치 이벤트 방지
+    document.addEventListener('touchmove', function(e) {
+        if (e.target.closest('.ranking-container') === null) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // 더블탭 줌 방지
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+
+    // 핀치 줌 방지
+    document.addEventListener('gesturestart', function(e) {
+        e.preventDefault();
+    });
+    
+    // ranking-container에 대한 특별 처리
+    const rankingContainer = document.querySelector('.ranking-container');
+    if (rankingContainer) {
+        rankingContainer.addEventListener('touchmove', function(e) {
+            e.stopPropagation();
+        }, { passive: true });
+    }
+
+    // 화면 크기 변경 방지
+    function preventZoom(e) {
+        if (e.touches.length > 1) {
+            e.preventDefault();
+        }
+    }
+
+    document.addEventListener('touchstart', preventZoom, { passive: false });
+    document.addEventListener('touchmove', preventZoom, { passive: false });
+    
     const gameContainer = document.getElementById('game-container');
     let nickname = '';
     let score = 0;
