@@ -199,17 +199,21 @@ button:hover {
 
 .arrow-button {
     width: 80%;
-    max-width: 300px;
+    max-width: calc(90% / 3); /* 전체 너비의 90%를 3등분 */
     margin: 0 10px;
     padding: 20px;
     background: none;
     border: none;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .arrow-button img {
     width: 100%;
     height: auto;
+
 }
 
 #arrow-sequence {
