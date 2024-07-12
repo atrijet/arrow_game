@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    if (!firebase.apps.length) {
+        console.error('Firebase가 초기화되지 않았습니다.');
+        return;
+    }
+
     const gameContainer = document.getElementById('game-container');
     let nickname = '';
     let score = 0;
@@ -7,6 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let correctCount = 0;
     let lastCorrectTime = 0;
     let isGameActive = false;
+
+    const database = firebase.database();
 
     function resetAllVariables() {
         nickname = '';
@@ -23,25 +30,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveRanking(nickname, score) {
-        let rankings = JSON.parse(localStorage.getItem('arrowGameRankings')) || [];
-        rankings.push({nickname, score});
-        rankings.sort((a, b) => b.score - a.score);
-        rankings = rankings.slice(0, 5);  // 상위 5개만 유지
-        localStorage.setItem('arrowGameRankings', JSON.stringify(rankings));
+        const rankingRef = database.ref('rankings');
+        rankingRef.push({
+            nickname: nickname,
+            score: score
+        }).then(() => {
+            console.log('Ranking saved successfully');
+        }).catch((error) => {
+            console.error('Error saving ranking:', error);
+        });
     }
 
-    function getRankings() {
-        return JSON.parse(localStorage.getItem('arrowGameRankings')) || [];
+    function getRankings(callback) {
+        const rankingRef = database.ref('rankings');
+        rankingRef.orderByChild('score').limitToLast(5).once('value', (snapshot) => {
+            const rankings = [];
+            snapshot.forEach((childSnapshot) => {
+                rankings.push(childSnapshot.val());
+            });
+            rankings.reverse(); // 높은 점수가 먼저 오도록 역순 정렬
+            callback(rankings);
+        }).catch((error) => {
+            console.error('Error getting rankings:', error);
+            callback([]);
+        });
     }
 
     function updateRankingDisplay() {
-        const rankings = getRankings();
-        const rankingList = document.querySelector('.ranking-list');
-        if (rankingList) {
-            rankingList.innerHTML = rankings.map((rank, index) => 
-                `<li>${index + 1}. ${rank.nickname} - ${rank.score} pts</li>`
-            ).join('');
-        }
+        getRankings((rankings) => {
+            const rankingList = document.querySelector('.ranking-list');
+            if (rankingList) {
+                rankingList.innerHTML = rankings.map((rank, index) => 
+                    `<li>${index + 1}. ${rank.nickname} - ${rank.score} pts</li>`
+                ).join('');
+            }
+        });
     }
 
     function createLoginScene() {
@@ -307,6 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         document.querySelector('.ranking-container').style.display = 'flex';
+        saveRanking(nickname, score);
         updateRankingDisplay();
         document.getElementById('restart-button').addEventListener('click', () => {
             resetGameVariables();
