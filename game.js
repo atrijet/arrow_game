@@ -1,9 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
-    if (!firebase.apps.length) {
-        console.error('Firebase가 초기화되지 않았습니다.');
-        return;
-    }
+import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 
+const database = getDatabase();
+
+document.addEventListener('DOMContentLoaded', () => {
     const gameContainer = document.getElementById('game-container');
     let nickname = '';
     let score = 0;
@@ -12,8 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let correctCount = 0;
     let lastCorrectTime = 0;
     let isGameActive = false;
-
-    const database = firebase.database();
 
     function resetAllVariables() {
         nickname = '';
@@ -30,8 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveRanking(nickname, score) {
-        const rankingRef = database.ref('rankings');
-        rankingRef.push({
+        const rankingRef = ref(database, 'rankings');
+        push(rankingRef, {
             nickname: nickname,
             score: score
         }).then(() => {
@@ -42,15 +39,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getRankings(callback) {
-        const rankingRef = database.ref('rankings');
-        rankingRef.orderByChild('score').limitToLast(5).once('value', (snapshot) => {
+        const rankingRef = ref(database, 'rankings');
+        const rankingQuery = query(rankingRef, orderByChild('score'), limitToLast(5));
+        onValue(rankingQuery, (snapshot) => {
             const rankings = [];
             snapshot.forEach((childSnapshot) => {
                 rankings.push(childSnapshot.val());
             });
             rankings.reverse(); // 높은 점수가 먼저 오도록 역순 정렬
             callback(rankings);
-        }).catch((error) => {
+        }, (error) => {
             console.error('Error getting rankings:', error);
             callback([]);
         });
@@ -67,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    
     function createLoginScene() {
         gameContainer.className = 'login-scene';
         gameContainer.innerHTML = `
