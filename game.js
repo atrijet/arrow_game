@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function startGame() {
             generateArrowSequence();
-            updateArrowSequence();
+            updateArrowSequence
             timeBarContainerElement.style.display = 'block';
             
             isGameActive = true;
@@ -242,12 +242,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateArrowSequence();
                     score++;
                     correctCount++;
-
+        
                     const currentTime = Date.now() / 1000;
                     if (currentTime - lastCorrectTime <= 1 && correctCount >= gameConfig.requiredCorrectCount) {
                         timeLeft += timeIncrement;
                         if (timeLeft < 1.5) {
-                            timeIncrement += gameConfig.timeIncrementReductionOnAdd * 2;
+                            timeIncrement += gameConfig.timeIncrementReductionOnAdd * gameConfig.timeIncrementMultiplierUnder1Sec;
                         } else {
                             timeIncrement = Math.max(0, timeIncrement - gameConfig.timeIncrementReductionOnAdd);
                         }
