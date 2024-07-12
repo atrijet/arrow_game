@@ -33,13 +33,14 @@
         const database = getDatabase(app);
         console.log("Firebase initialized successfully");
         window.database = database;  // Make database globally accessible
+        window.firebaseApp = app;
+        window.firebaseDatabase = database;
         } catch (error) {
             console.error("Error initializing Firebase:", error);
         }
 
         // Make Firebase instances available globally
-        window.firebaseApp = app;
-        window.firebaseDatabase = database;
+        
     </script>
 
     <script src="gameConfig.js"></script>
