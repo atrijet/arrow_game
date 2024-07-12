@@ -81,8 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <input type="text" id="nickname" placeholder="Enter your nickname">
                 <button id="start-button">Start</button>
             </div>
+            <div class="ranking-container">
+                <h3>Top 5 Rankings</h3>
+                <ul class="ranking-list"></ul>
+            </div>
         `;
-
+    
         document.getElementById('start-button').addEventListener('click', () => {
             nickname = document.getElementById('nickname').value.trim();
             if (nickname !== '') {
@@ -91,8 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Please enter a nickname.');
             }
         });
+    
+        // 랭킹 표시 업데이트
+        updateRankingDisplay();
     }
-
+    
     function createReadyScene() {
         gameContainer.className = 'other-scene';
         gameContainer.innerHTML = `
