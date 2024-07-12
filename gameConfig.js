@@ -13,7 +13,7 @@ const gameConfig = {
     bgColorUnder1Sec: 'rgb(252, 130, 130)', // Background color for time < 1s
     bgColorGameOver: 'rgb(20, 0, 0)', // Background color for game over
     arrowSequenceLength: 5,  // 새로 추가된 변수
-    timeIncrementMultiplierUnder1Sec: 5, // 1초 미만일 때 적용할 승수
+    timeIncrementMultiplierUnder1Sec: 2, // 1초 미만일 때 적용할 승수
 
     // 이전에 정의한 설정들도 유지합니다
     countdownTime: 3,

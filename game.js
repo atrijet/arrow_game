@@ -286,12 +286,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
                     const currentTime = Date.now() / 1000;
                     if (currentTime - lastCorrectTime <= 1 && correctCount >= gameConfig.requiredCorrectCount) {
-                        timeLeft += timeIncrement;
-                        if (timeLeft < 1.5) {
-                            timeIncrement += gameConfig.timeIncrementReductionOnAdd * gameConfig.timeIncrementMultiplierUnder1Sec;
+                        
+                        if (timeLeft < 1) {
+                            timeLeft += timeIncrement*gameConfig.timeIncrementMultiplierUnder1Sec+0.7;
                         } else {
                             timeIncrement = Math.max(0, timeIncrement - gameConfig.timeIncrementReductionOnAdd);
+                            timeLeft += timeIncrement;
                         }
+                        
                         correctCount = 0;
                     }
                     lastCorrectTime = currentTime;
