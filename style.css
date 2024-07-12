@@ -175,16 +175,10 @@ button:hover {
     margin: 20px auto;
 }
 
-.press-arrow-image {
-    width: 20%;
+.press-arrow-image, .arrow-image {
+    width: 15%; /* 이미지 크기 줄임 */
     height: auto;
-    margin-right: 10px;
-}
-
-.arrow-image {
-    width: 20%;
-    height: auto;
-    margin: 0 1.5%;
+    margin: 0 1%;
 }
 
 #countdown {
@@ -296,6 +290,6 @@ button:hover {
          3px 0 0 #000,
          0 -3px 0 #000,
          0 3px 0 #000;
-    font-size: 36px;
+    font-size: 24px;
     margin-bottom: 30px;
 }
