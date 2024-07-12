@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button id="start-button">Start</button>
             </div>
             <div class="ranking-container">
-                <h3 class="ranking-title">Top 5 Rankings</h3>
+                <h3 class="ranking-title">Rankings</h3>
                 <ul class="ranking-list"></ul>
             </div>
         `;
